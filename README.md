@@ -2,7 +2,7 @@
 
 # User Feed Importer
 
-_Current Version:_ v0.1.0 [![CircleCI](https://circleci.com/bb/ognlift/adbutler-user-campaigns/tree/master.svg?style=shield&circle-token=a41f8b8616ce8cae0ad2c753699f03cc78284fc2)](https://circleci.com/bb/ognlift/adbutler-user-campaigns/tree/master)
+_Current Version:_ v0.1.0 [![CircleCI](https://circleci.com/gh/ourgreennation/user-feed-importer/tree/master.svg?style=shield&circle-token=4939b224898ff8c14dec6f98e7ccfd727589d484)](https://circleci.com/gh/ourgreennation/user-feed-importer/tree/master)
 
 ## Installation
 1. Activate
