@@ -362,7 +362,10 @@ class User_Feed_Item_Importer {
 
 		// If error storing permanently, delete the temp and return the error.
 		if ( is_wp_error( $thumb_id ) ) {
+			// @codingStandardsIgnoreStart
+			// It is best practice to suppress errors when unlinking.
 			@unlink( $file_array['tmp_name'] );
+			// @codingStandardsIgnoreEnd
 			return $thumb_id;
 		}
 
