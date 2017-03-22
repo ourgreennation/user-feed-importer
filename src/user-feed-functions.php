@@ -13,9 +13,9 @@ namespace Lift\Campus_Insiders\User_Feed_Importer;
 /**
  * Override Rel Canonical on User Posts
  *
- * @param  string   $canonical_url The original canonical url
- * @param  \WP_Post $post          A WP_Post object
- * @return string                  Filtered canonical url
+ * @param  string   $canonical_url The original canonical url.
+ * @param  \WP_Post $post          A WP_Post object.
+ * @return string                  Filtered canonical url.
  */
 function csl_posts_rel_canonical( $canonical_url, \WP_Post $post ) {
 	if ( ! has_term( 'collegiate-starleague', 'scci_conference', $post ) ) {
