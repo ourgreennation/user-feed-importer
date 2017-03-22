@@ -7,7 +7,7 @@
  * @package  User_Feed_Importer
  */
 
-namespace Lift\Campus_Insiders\User_Feed_Importer;
+namespace Lift\Plugins\User_Feed_Importer;
 
 /**
  * Class: User_Feed_Item_Importer

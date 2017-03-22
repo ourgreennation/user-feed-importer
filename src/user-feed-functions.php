@@ -8,7 +8,7 @@
  * @package  User_Feed_Importer
  */
 
-namespace Lift\Campus_Insiders\User_Feed_Importer;
+namespace Lift\Plugins\User_Feed_Importer;
 
 /**
  * Override Rel Canonical on User Posts
