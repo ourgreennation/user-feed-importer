@@ -14,6 +14,9 @@
 
 namespace Lift\Plugins\User_Feed_Importer;
 
+// Require the user feed manager.
+require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-manager.php' );
+
 // Require the importer.
 require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-importer.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-item-importer.php' );
@@ -57,10 +60,23 @@ register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate' );
  * @return void
  */
 function deactivate() {
-	$scheduler = new CSL_Feed_Import_Scheduler;
+	$scheduler = new User_Feed_Import_Scheduler;
 	$scheduler->clear();
 }
 register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivate' );
+
+/**
+ * User Manager
+ *
+ * @return void
+ */
+function user_feed_manager() {
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+	$user_feed_manager = new User_Feed_Manager( get_current_user() );
+}
+add_action( 'init', __NAMESPACE__ . '\\user_feed_manager' );
 
 /**
  * Run
