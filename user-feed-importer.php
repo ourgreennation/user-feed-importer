@@ -5,7 +5,7 @@
  * Description:     Imports Articles as WordPress Posts from User defined RSS feed.
  * Author:          Christian Chung <christian@liftux.com>
  * Author URI:      https://liftux.com
- * Text Domain:     contributor-feed-importer
+ * Text Domain:     user-feed-importer
  * Domain Path:     /languages
  * Version:         0.1.0
  *
