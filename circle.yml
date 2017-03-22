@@ -10,7 +10,7 @@ dependencies:
     - phpcs -i
 test:
   override:
-    - phpcs --standard=phpcs.ruleset.xml includes/
+    - phpcs --standard=phpcs.ruleset.xml src/
   post:
     - rm -rf .git
 
