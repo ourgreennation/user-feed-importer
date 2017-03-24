@@ -50,7 +50,6 @@ function activate() {
 	// Schedule the first run.
 	$scheduler->setup()->schedule_next( $first_run );
 }
-register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate' );
 
 /**
  * Deactivate
@@ -63,7 +62,6 @@ function deactivate() {
 	$scheduler = new User_Feed_Import_Scheduler;
 	$scheduler->clear();
 }
-register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivate' );
 
 /**
  * User Manager
@@ -74,7 +72,7 @@ function user_feed_manager() {
 	if ( ! is_user_logged_in() ) {
 		return;
 	}
-	$user_feed_manager = new User_Feed_Manager( get_current_user() );
+	$user_feed_manager = User_Feed_Manager::factory( wp_get_current_user() )->setup();
 }
 add_action( 'init', __NAMESPACE__ . '\\user_feed_manager' );
 
