@@ -23,14 +23,14 @@ class User_Feed_Import_Scheduler {
 	 *
 	 * @var string  The cron hook to attach the import event to.
 	 */
-	protected $hook = 'csl_feed_import';
+	protected $hook = 'user_feed_import';
 
 	/**
 	 * Recurrence
 	 *
 	 * @var string  Name to reference the interval.
 	 */
-	protected $recurrence = 'csl_feed_import_recurrence';
+	protected $recurrence = 'user_feed_import_recurrence';
 
 	/**
 	 * Interval
@@ -40,21 +40,47 @@ class User_Feed_Import_Scheduler {
 	public $interval = 14400;
 
 	/**
+	 * User ID
+	 *
+	 * @var int The Id of the User we are scheduling an import for.
+	 */
+	public $user_id;
+
+	/**
+	 * RSS Feed URL
+	 *
+	 * @var string The URL to the feed we are scheduling an import for.
+	 */
+	public $rss_feed_url;
+
+	/**
 	 * Constructor
 	 *
 	 * Sets up the Scheduler with the options from the settings page
 	 *
+	 * @param int $user_id The User ID we are scheduling rss imports for.
 	 * @return  User_Feed_Import_Scheduler Instance of self.
 	 */
-	public function __construct() {
+	public function __construct( $user_id = null, $rss_feed_url = null ) {
+		$this->user_id = absint( $user_id );
+		$this->rss_feed_url = $rss_feed_url;
+
 		// Extract interval from options.
-		$opts = get_option( 'csl_feed_import_options' );
+		$opts = get_option( 'user_feed_import_options' );
 
 		if ( is_array( $opts ) && isset( $opts['interval'] ) ) {
 			$this->interval = absint( $opts['interval'] ) * HOUR_IN_SECONDS;
 		}
-
 		return $this;
+	}
+
+	/**
+	 * Get Hook Arguments
+	 *
+	 * @return array An array of arguments to pass the cron hook.
+	 */
+	public function get_hook_args() {
+		return array( $this->user_id );
 	}
 
 	/**
@@ -70,7 +96,6 @@ class User_Feed_Import_Scheduler {
 		add_action( $this->hook, array( $this, 'import' ) );
 		add_filter( 'cron_schedules', array( $this, 'add_recurrence' ), 10, 1 );
 		add_action( 'update_option', array( $this, 'reset_schedule' ), 10, 3 );
-		add_action( 'admin_footer', array( $this, 'schedule_next' ), 10, 3 );
 		return $this;
 	}
 
@@ -85,11 +110,11 @@ class User_Feed_Import_Scheduler {
 	 */
 	public function schedule_next( $time = null ) {
 		$scheduled = false;
-		if ( ! wp_next_scheduled( $this->hook ) ) {
+		if ( ! wp_next_scheduled( $this->hook, $this->get_hook_args() ) ) {
 			if ( ! $time ) {
-				$time = time();
+				$time = time() + MINUTE_IN_SECONDS;
 			}
-			$scheduled = wp_schedule_event( $time, $this->recurrence, $this->hook );
+			$scheduled = wp_schedule_event( $time, $this->recurrence, $this->hook, $this->get_hook_args() );
 		}
 		return $scheduled;
 	}
@@ -118,8 +143,10 @@ class User_Feed_Import_Scheduler {
 	 *
 	 * @return User_Feed_Importer An instance of User_Feed_Importer.
 	 */
-	public function import() {
-		$importer = new User_Feed_Importer;
+	public function import( $user_id ) {
+		$user_id = absint( $user_id );
+		$rss_feed_url = get_user_meta( $user_id, 'rss_feed_url', true );
+		$importer = new User_Feed_Importer( $user_id, $rss_feed_url );
 		$importer->import();
 
 		return $importer;
@@ -136,7 +163,7 @@ class User_Feed_Import_Scheduler {
 	 * @return void
 	 */
 	public function reset_schedule( $option, $old, $new ) {
-		if ( 'csl_feed_import_options' !== $option ) {
+		if ( 'user_feed_import_options' !== $option ) {
 			return;
 		}
 
@@ -152,9 +179,10 @@ class User_Feed_Import_Scheduler {
 	 *
 	 * Clears all the cron hooks
 	 *
-	 * @return void
+	 * @return User_Feed_Import_Scheduler Instance of self.
 	 */
 	public function clear() {
-		wp_clear_scheduled_hook( $this->hook );
+		wp_clear_scheduled_hook( $this->hook, $this->get_hook_args() );
+		return $this;
 	}
 }
