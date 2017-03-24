@@ -132,7 +132,7 @@ class User_Feed_Manager {
 			name="user_rss_feed"
 			type="text"
 			value="<?php echo esc_attr( $url ) ?>"
-			aria-required="false">
+			aria-rqqequired="false">
 		</div>
 		<?php
 	}
