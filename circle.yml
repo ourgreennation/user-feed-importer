@@ -13,6 +13,8 @@ test:
     - phpcs --standard=phpcs.ruleset.xml src/
   post:
     - phpcbf --standard=phpcs.ruleset.xml src/
+    - git config user.email "christian.m.chung@gmail.com"
+    - git config user.name "Christian Chung via Circle CI"
     - git add .
     - git commit -m 'chore(auto-phpcbf)'
     - git push origin $CIRCLE_BRANCH
