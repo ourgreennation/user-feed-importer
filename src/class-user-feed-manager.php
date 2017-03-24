@@ -37,7 +37,7 @@ class User_Feed_Manager {
 		'administrator',
 		'editor',
 		'author',
-		'ogn_contributor'
+		'ogn_contributor',
 	);
 
 	/**
@@ -118,14 +118,14 @@ class User_Feed_Manager {
 	 * @return void
 	 */
 	public function add_bp_rss_profile_field() {
-		if(  ( 1 !== bp_get_the_profile_group_id()  && ! is_admin() ) ) {
+		if ( ( 1 !== bp_get_the_profile_group_id()  && ! is_admin() ) ) {
 			return;
 		}
 		$url = get_user_meta( bp_displayed_user_id(), 'user_rss_feed', true );
 		?>
 		<div class="bp-profile-field editfield field_type_textbox field_user_feed_importer" >
 			<label for="user_rss_feed" class="label">
-				<?php _e( 'RSS Feed URL', 'user-feed-importer') ?>
+				<?php _e( 'RSS Feed URL', 'user-feed-importer' ) ?>
 			</label>
 			<input
 			id="user_rss_feed"

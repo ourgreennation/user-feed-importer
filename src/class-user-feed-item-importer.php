@@ -173,7 +173,7 @@ class User_Feed_Item_Importer {
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
 	public function handle_body() {
-		$content = ( string ) $this->item->children( $this->namespaces['content'] )->encoded;
+		$content = (string) $this->item->children( $this->namespaces['content'] )->encoded;
 
 		if ( $content ) {
 			$content = htmlspecialchars_decode( $content, ENT_COMPAT | ENT_HTML5 );
