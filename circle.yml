@@ -12,6 +12,10 @@ test:
   override:
     - phpcs --standard=phpcs.ruleset.xml src/
   post:
+    - phpcbf --standard=phpcs.ruleset.xml src/
+    - git add .
+    - git commit -m 'chore(auto-phpcbf)'
+    - git push origin $CIRCLE_BRANCH
     - rm -rf .git
 
 deployment:
