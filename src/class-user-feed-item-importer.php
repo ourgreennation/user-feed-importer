@@ -65,7 +65,7 @@ class User_Feed_Item_Importer {
 		'dc' => 'http://purl.org/dc/elements/1.1/',
 		'atom' => 'http://www.w3.org/2005/Atom',
 		'sy' => 'http://purl.org/rss/1.0/modules/syndication/',
-		'slash' => 'http://purl.org/rss/1.0/modules/slash/'
+		'slash' => 'http://purl.org/rss/1.0/modules/slash/',
 	);
 
 	/**
