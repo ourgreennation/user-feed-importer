@@ -54,14 +54,24 @@ class User_Feed_Item_Importer {
 	 */
 	public $inserted = false;
 
+	protected $namespaces = array(
+		'content' => 'http://purl.org/rss/1.0/modules/content/',
+		'wfw' => 'http://wellformedweb.org/CommentAPI/',
+		'dc' => 'http://purl.org/dc/elements/1.1/',
+		'atom' => 'http://www.w3.org/2005/Atom',
+		'sy' => 'http://purl.org/rss/1.0/modules/syndication/',
+		'slash' => 'http://purl.org/rss/1.0/modules/slash/',
+	);
+
 	/**
 	 * Constructor
 	 *
 	 * @param \SimpleXMLElement $item The item to be inserted.
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
-	public function __construct( \SimpleXMLElement $item ) {
+	public function __construct( \SimpleXMLElement $item, $user_id ) {
 		$this->item = $item;
+		$this->user_id = absint( $user_id );
 		$this->post = array();
 
 		$this->ensure_core_dependencies();
@@ -123,7 +133,7 @@ class User_Feed_Item_Importer {
 				}
 			}
 		}
-
+		error_log( print_r( $this, true ) );
 		return $this;
 	}
 
@@ -148,7 +158,8 @@ class User_Feed_Item_Importer {
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
 	public function handle_excerpt() {
-		$this->post['post_excerpt'] = wp_strip_all_tags( $this->item->description );
+		$description = htmlspecialchars_decode( $this->item->description, ENT_COMPAT | ENT_HTML5 );
+		$this->post['post_excerpt'] = wp_strip_all_tags( $description );
 
 		return $this;
 	}
@@ -156,14 +167,23 @@ class User_Feed_Item_Importer {
 	/**
 	 * Handle Body
 	 *
-	 * Decodes the htmlspecialchars present on the item body and sets the post_content on the $post
+	 * Decodes the htmlspecialchars present on the item content and sets the post_content on the $post
 	 * property.
 	 *
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
 	public function handle_body() {
-		$content = htmlspecialchars_decode( $this->item->body, ENT_COMPAT | ENT_HTML5 );
-		$content = wp_kses_post( $content );
+		$content = ( string ) $this->item->children( $this->namespaces['content'] )->encoded;
+
+		if ( $content ) {
+			$content = htmlspecialchars_decode( $content, ENT_COMPAT | ENT_HTML5 );
+			$content = wp_kses_post( $content );
+		} else {
+			$format = '<br/><a href="%s" target="_blank">%s</a>';
+			$default_link = sprintf( $format, $this->item->link, 'Read Full Article' );
+			$link = apply_filters( 'user_import_read_more_link', $default_link, $this->item );
+			$content = apply_filters( 'wpautop', $this->post['post_excerpt'] ) . $link;
+		}
 		$this->post['post_content'] = $content;
 		return $this;
 	}
@@ -177,12 +197,7 @@ class User_Feed_Item_Importer {
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
 	public function handle_author() {
-		$this->post['post_author'] = 1;
-		$options = \get_option( 'csl_feed_import_options' );
-
-		if ( false !== $options && isset( $options['author'] ) ) {
-			$this->post['post_author'] = $options['author'];
-		}
+		$this->post['post_author'] = absint( $this->user_id );
 
 		return $this;
 	}
@@ -221,13 +236,13 @@ class User_Feed_Item_Importer {
 	 * Handle Post Status
 	 *
 	 * Reads the User defined Post Status from the options page and sets this as the
-	 * post_status.  If undefined in the options, defaults to publish.
+	 * post_status.  If undefined in the options, defaults to draft.
 	 *
 	 * @return User_Feed_Item_Importer Instance of self
 	 */
 	public function handle_post_status() {
-		$this->post['post_status'] = 'publish';
-		$options = \get_option( 'csl_feed_import_options' );
+		$this->post['post_status'] = 'draft';
+		$options = \get_option( 'user_feed_import_options' );
 
 		if ( false !== $options && isset( $options['post_status'] ) ) {
 			if ( in_array( $options['post_status'], get_post_statuses(), true ) ) {
@@ -273,11 +288,11 @@ class User_Feed_Item_Importer {
 	 */
 	protected function insert_as_post() {
 		$this->post_id = wp_insert_post( $this->post );
-
+		error_log( 'Post ID: ' . $this->post_id );
 		if ( $this->post_id && ! is_wp_error( $this->post_id ) ) {
 			$this->inserted = true;
 		}
-
+		error_log( print_r( $this, true ) );
 		return $this;
 	}
 
@@ -295,8 +310,6 @@ class User_Feed_Item_Importer {
 
 		$mappings = array(
 			wp_set_object_terms( $this->post_id, $this->get_tags(), 'post_tag', true ),
-			wp_set_object_terms( $this->post_id, [ 'Collegiate Starleague' ], 'scci_conference', true ),
-			wp_set_object_terms( $this->post_id, [ 'eSports' ], 'scci_school', true ),
 		);
 
 		return $mappings;
@@ -309,17 +322,17 @@ class User_Feed_Item_Importer {
 	 */
 	protected function get_tags() {
 		$default_tags = array(
-			'eSports',
+			'import',
 			);
 
 		/**
-		 * Filter: csl_feed_post_tags
+		 * Filter: user_feed_post_tags
 		 *
 		 * @param  array             $tags     An array of tag slugs to map to the post.
 		 * @param  int               $post_id  The Post ID of the post we're adding tags to.
 		 * @param  \SimpleXMLElement $item     The Feed Item that was imported.
 		 */
-		return apply_filters( 'csl_feed_post_tags', $default_tags, $this->post_id, $this->item );
+		return apply_filters( 'user_feed_post_tags', $default_tags, $this->post_id, $this->item );
 	}
 
 	/**
@@ -388,7 +401,7 @@ class User_Feed_Item_Importer {
 			return $this;
 		}
 
-		$options = \get_option( 'csl_feed_import_options' );
+		$options = \get_option( 'user_feed_import_options' );
 
 		if ( false !== $options && isset( $options['default_media'] ) ) {
 			$this->featured_image = absint( $options['default_media'] );
