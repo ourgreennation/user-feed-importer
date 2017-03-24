@@ -33,6 +33,11 @@ class User_Feed_Manager {
 	 */
 	public $is_authorized = false;
 
+	/**
+	 * Default Roles
+	 *
+	 * @var array An array of default roles.
+	 */
 	public $default_roles = array(
 		'administrator',
 		'editor',

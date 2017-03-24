@@ -57,7 +57,9 @@ class User_Feed_Importer {
 	 *
 	 * Gets the feed contents and sets up member variables from the feed.
 	 *
-	 * @return  User_Feed_Importer Instance of self.
+	 * @param int    $user_id      The ID of the user.
+	 * @param string $rss_feed_url The URL to the RSS Feed.
+	 * @return User_Feed_Importer  Instance of self.
 	 */
 	public function __construct( $user_id, $rss_feed_url ) {
 		$this->user_id = absint( $user_id );

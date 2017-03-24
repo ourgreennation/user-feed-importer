@@ -58,8 +58,9 @@ class User_Feed_Import_Scheduler {
 	 *
 	 * Sets up the Scheduler with the options from the settings page
 	 *
-	 * @param int $user_id The User ID we are scheduling rss imports for.
-	 * @return  User_Feed_Import_Scheduler Instance of self.
+	 * @param int    $user_id      The User ID we are scheduling rss imports for.
+	 * @param string $rss_feed_url The URL to the RSS Feed.
+	 * @return User_Feed_Import_Scheduler Instance of self.
 	 */
 	public function __construct( $user_id = null, $rss_feed_url = null ) {
 		$this->user_id = absint( $user_id );
@@ -141,6 +142,7 @@ class User_Feed_Import_Scheduler {
 	 *
 	 * Imports items from User RSS Feed
 	 *
+	 * @param int $user_id The ID of the user.
 	 * @return User_Feed_Importer An instance of User_Feed_Importer.
 	 */
 	public function import( $user_id ) {

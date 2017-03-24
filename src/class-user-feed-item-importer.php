@@ -54,20 +54,26 @@ class User_Feed_Item_Importer {
 	 */
 	public $inserted = false;
 
+	/**
+	 * Namespaces
+	 *
+	 * @var array An array of RSS XML Element Namespace sources.
+	 */
 	protected $namespaces = array(
 		'content' => 'http://purl.org/rss/1.0/modules/content/',
 		'wfw' => 'http://wellformedweb.org/CommentAPI/',
 		'dc' => 'http://purl.org/dc/elements/1.1/',
 		'atom' => 'http://www.w3.org/2005/Atom',
 		'sy' => 'http://purl.org/rss/1.0/modules/syndication/',
-		'slash' => 'http://purl.org/rss/1.0/modules/slash/',
+		'slash' => 'http://purl.org/rss/1.0/modules/slash/'
 	);
 
 	/**
 	 * Constructor
 	 *
-	 * @param \SimpleXMLElement $item The item to be inserted.
-	 * @return  User_Feed_Item_Importer Instance of self
+	 * @param \SimpleXMLElement $item    The item to be inserted.
+	 * @param int               $user_id The ID of the user.
+	 * @return User_Feed_Item_Importer   Instance of self.
 	 */
 	public function __construct( \SimpleXMLElement $item, $user_id ) {
 		$this->item = $item;
