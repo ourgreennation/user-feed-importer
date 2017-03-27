@@ -16,7 +16,11 @@ test:
     - rm -rf .git
 
 deployment:
-  deploy:
+  production:
     branch: master
     commands:
       - rsync -avz -e 'ssh -p 18765' --progress ./ leyan503@77.104.152.91:/home/leyan503/public_html/wp-content/plugins/user-feed-importer  --delete
+  staging:
+    branch: staging
+    commands:
+      - rsync -avz -e 'ssh -p 18765' --progress ./ leyan503@77.104.152.91:/home/leyan503/public_html/staging/wp-content/plugins/user-feed-importer  --delete
