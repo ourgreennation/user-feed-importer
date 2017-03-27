@@ -90,6 +90,8 @@ class User_Feed_Importer {
 		try {
 			$parsed = new \SimpleXMLElement( $feed );
 		} catch ( \Exception $e ) {
+			error_log( 'Error parsing RSS from ' . $feed );
+			error_log( $e->getMessage() );
 			$this->handle_failure();
 			$parsed = null;
 		}

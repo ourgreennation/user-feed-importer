@@ -158,7 +158,7 @@ class User_Feed_Import_Scheduler {
 	 */
 	public function import( $user_id ) {
 		$user_id = absint( $user_id );
-		$rss_feed_url = get_user_meta( $user_id, 'rss_feed_url', true );
+		$rss_feed_url = get_user_meta( $user_id, 'user_rss_feed', true );
 		$importer = new User_Feed_Importer( $user_id, $rss_feed_url );
 		$importer->import();
 
