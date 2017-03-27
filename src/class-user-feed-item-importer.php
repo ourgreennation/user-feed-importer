@@ -221,12 +221,12 @@ class User_Feed_Item_Importer {
 	/**
 	 * Handle GUID
 	 *
-	 * Reads the guid from the item and sets the guid on the $post property.
+	 * Reads the link from the item and sets the guid on the $post property.
 	 *
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
 	public function handle_guid() {
-		$this->post['guid'] = sanitize_text_field( $this->item->guid );
+		$this->post['guid'] = sanitize_text_field( $this->item->link );
 
 		return $this;
 	}
