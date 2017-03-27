@@ -241,11 +241,11 @@ class User_Feed_Item_Importer {
 	 */
 	public function handle_post_status() {
 		$this->post['post_status'] = 'draft';
-		$options = \get_option( 'user_feed_import_options' );
+		$post_status = User_Feed_Options::get_option( 'post_status' );
 
-		if ( false !== $options && isset( $options['post_status'] ) ) {
-			if ( in_array( $options['post_status'], get_post_statuses(), true ) ) {
-				$this->post['post_status'] = $options['post_status'];
+		if ( $post_status ) {
+			if ( in_array( $post_status, get_post_statuses(), true ) ) {
+				$this->post['post_status'] = $post_status;
 			}
 		}
 
