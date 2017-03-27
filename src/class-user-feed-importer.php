@@ -17,11 +17,19 @@ namespace Lift\Plugins\User_Feed_Importer;
  * @since  v0.1.0
  */
 class User_Feed_Importer {
+	/**
+	 * User ID
+	 *
+	 * @var int The User ID we are importing posts for.
+	 */
+	public $user_id;
 
 	/**
-	 * The Url to the Feed
+	 * Feed Url
+	 *
+	 * @var string The Url to the Feed.
 	 */
-	const FEED = 'https://cstarleague.com/feed.rss';
+	public $rss_feed_url;
 
 	/**
 	 * Post Ids of Imported Posts
@@ -49,9 +57,13 @@ class User_Feed_Importer {
 	 *
 	 * Gets the feed contents and sets up member variables from the feed.
 	 *
-	 * @return  User_Feed_Importer Instance of self.
+	 * @param int    $user_id      The ID of the user.
+	 * @param string $rss_feed_url The URL to the RSS Feed.
+	 * @return User_Feed_Importer  Instance of self.
 	 */
-	public function __construct() {
+	public function __construct( $user_id, $rss_feed_url ) {
+		$this->user_id = absint( $user_id );
+		$this->rss_feed_url = $rss_feed_url;
 		$this->post_ids = array();
 		$this->raw_feed = $this->get_feed_contents();
 		$this->parsed_feed = $this->parse_feed( $this->raw_feed );
@@ -65,7 +77,7 @@ class User_Feed_Importer {
 	 * @return string The raw contents of the feed.
 	 */
 	protected function get_feed_contents() {
-		return wpcom_vip_file_get_contents( self::FEED );
+		return wp_remote_retrieve_body( wp_remote_get( $this->rss_feed_url ) );
 	}
 
 	/**
@@ -96,7 +108,7 @@ class User_Feed_Importer {
 	public function import() {
 		if ( ! is_null( $this->parsed_feed ) && ! empty( $this->parsed_feed->channel->item ) ) {
 			foreach ( $this->parsed_feed->channel->item as $item ) {
-				$item_importer = new User_Feed_Item_Importer( $item );
+				$item_importer = new User_Feed_Item_Importer( $item, $this->user_id );
 				$item_importer->import();
 
 				if ( ! is_wp_error( $item_importer->post_id ) ) {

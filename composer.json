@@ -1,0 +1,14 @@
+{
+    "name": "liftux/user-feed-importer",
+    "description": "A WordPress plugin that allows users to import RSS feeds.",
+    "type": "wordpress-plugin",
+    "license": "GPL2+",
+    "authors": [
+        {
+            "name": "Christian Chung",
+            "email": "christian@liftux.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}

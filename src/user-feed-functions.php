@@ -11,6 +11,16 @@
 namespace Lift\Plugins\User_Feed_Importer;
 
 /**
+ * Hook Slug
+ *
+ * @param  string $hook A hook name to prepend with the hook slug.
+ * @return string       A "namespaced" hook name.
+ */
+function hook_slug( $hook ) {
+	return 'user_feed_importer_' . $hook;
+}
+
+/**
  * Override Rel Canonical on User Posts
  *
  * @param  string   $canonical_url The original canonical url.

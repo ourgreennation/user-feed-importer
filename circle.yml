@@ -12,6 +12,7 @@ test:
   override:
     - phpcs --standard=phpcs.ruleset.xml src/
   post:
+    - chmod +x ./circleci/auto-phpcbf.sh && ./circleci/auto-phpcbf.sh
     - rm -rf .git
 
 deployment:
