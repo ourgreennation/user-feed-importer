@@ -38,7 +38,7 @@ class User_Feed_Manager {
 	 *
 	 * @var array An array of default roles.
 	 */
-	public $default_roles = array(
+	public static $default_roles = array(
 		'administrator',
 		'editor',
 		'author',
@@ -58,7 +58,7 @@ class User_Feed_Manager {
 		 *
 		 * @param $default_roles Array of default roles.  Administrator, Editor, Author.
 		 */
-		$this->authorized_roles = apply_filters( hook_slug( 'authorized_roles' ), $this->default_roles );
+		$this->authorized_roles = self::get_roles();
 
 		if ( ! empty( array_intersect( $this->user->roles, $this->authorized_roles ) ) ) {
 			$this->is_authorized = true;
@@ -100,6 +100,15 @@ class User_Feed_Manager {
 		// When a user adds or updates a feed, schedule imports for the feed.
 		add_action( 'update_user_meta', array( $this, 'handle_feed_meta_update' ), 10, 4 );
 		return $this;
+	}
+
+	/**
+	 * Get Roles
+	 *
+	 * @return array An array of roles authorized to import RSS feeds.
+	 */
+	public static function get_roles() {
+		return apply_filters( 'user_feed_importer_authorized_roles', self::$default_roles );
 	}
 
 	/**

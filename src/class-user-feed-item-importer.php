@@ -132,14 +132,8 @@ class User_Feed_Item_Importer {
 
 				// Map the featured image.
 				$image_mapped = $this->map_featured_image();
-
-				// Map default featured image, if mapping provided image failed.
-				if ( false === $image_mapped || is_wp_error( $image_mapped ) ) {
-					$this->map_default_featured_image();
-				}
 			}
 		}
-		error_log( print_r( $this, true ) );
 		return $this;
 	}
 
@@ -197,8 +191,7 @@ class User_Feed_Item_Importer {
 	/**
 	 * Handle Author
 	 *
-	 * Reads the author assigned to publish the feed from the option table and sets the post_author
-	 * on the $post property.
+	 * Sets the author to the user in charge of this feed.
 	 *
 	 * @return  User_Feed_Item_Importer Instance of self
 	 */
@@ -294,11 +287,9 @@ class User_Feed_Item_Importer {
 	 */
 	protected function insert_as_post() {
 		$this->post_id = wp_insert_post( $this->post );
-		error_log( 'Post ID: ' . $this->post_id );
 		if ( $this->post_id && ! is_wp_error( $this->post_id ) ) {
 			$this->inserted = true;
 		}
-		error_log( print_r( $this, true ) );
 		return $this;
 	}
 
@@ -354,7 +345,7 @@ class User_Feed_Item_Importer {
 	protected function map_featured_image() {
 		$image_url = $this->item->featured_image;
 
-		// Bail if we don't have a post to attach to, or if the url provided isn't valid.
+		// Bail if we don't have a post to attach to, or if the url (if provided) isn't valid.
 		if ( ! $this->post_id || ! filter_var( (string) $image_url, FILTER_VALIDATE_URL ) ) {
 			return false;
 		}
@@ -391,29 +382,5 @@ class User_Feed_Item_Importer {
 		// Store the feautured image ID and return the result of setting it on the post.
 		$this->featured_image = absint( $thumb_id );
 		return set_post_thumbnail( $this->post_id, $this->featured_image );
-	}
-
-	/**
-	 * Map Default Featured Media
-	 *
-	 * Reads the default media from the options page and if defined there, sets it as the imported
-	 * post thumbnail.  Should not run if featured image was set to provided image.
-	 *
-	 * @return User_Feed_Item_Importer Instance of self
-	 */
-	protected function map_default_featured_image() {
-		// Bail early if the featured image is already set.
-		if ( $this->featured_image ) {
-			return $this;
-		}
-
-		$options = \get_option( 'user_feed_import_options' );
-
-		if ( false !== $options && isset( $options['default_media'] ) ) {
-			$this->featured_image = absint( $options['default_media'] );
-			set_post_thumbnail( absint( $this->post_id ), $this->featured_image );
-		}
-
-		return $this;
 	}
 }

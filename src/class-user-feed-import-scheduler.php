@@ -67,21 +67,32 @@ class User_Feed_Import_Scheduler {
 		$this->rss_feed_url = $rss_feed_url;
 
 		// Extract interval from options.
-		$opts = get_option( 'user_feed_import_options' );
+		$interval = User_Feed_Options::get_option( 'interval' );
 
-		if ( is_array( $opts ) && isset( $opts['interval'] ) ) {
-			$this->interval = absint( $opts['interval'] ) * HOUR_IN_SECONDS;
+		if ( $interval ) {
+			$this->interval = absint( $interval ) * HOUR_IN_SECONDS;
 		}
 		return $this;
 	}
 
 	/**
+	 * Factory
+	 *
+	 * @param int    $user_id      The User ID we are scheduling rss imports for.
+	 * @param string $rss_feed_url The URL to the RSS Feed.
+	 * @return User_Feed_Import_Scheduler Instance of self.
+	 */
+	public static function factory( $user_id = null, $rss_feed_url = null ) {
+		return new self( $user_id, $rss_feed_url );
+	}
+
+	/**
 	 * Get Hook Arguments
 	 *
-	 * @return array An array of arguments to pass the cron hook.
+	 * @return array|null An array of arguments to pass the cron hook, or null.
 	 */
 	public function get_hook_args() {
-		return array( $this->user_id );
+		return $this->user_id ? array( $this->user_id ) : null;
 	}
 
 	/**
