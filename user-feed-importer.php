@@ -28,40 +28,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-import-schedule
 require_once( plugin_dir_path( __FILE__ ) . 'src/user-feed-functions.php' );
 
 // Require the options page if we're in the admin.
-if ( is_admin() ) {
-	require_once( plugin_dir_path( __FILE__ ) . 'src/user-feed-options.php' );
-}
-
-/**
- * Activate
- *
- * Schedules the importer cron job on plugin activation
- *
- * @return void
- */
-function activate() {
-	$scheduler = new User_Feed_Import_Scheduler;
-	// The first run will start run in 20 minutes.
-	$first_run = time() + ( 20 * MINUTE_IN_SECONDS );
-
-	// Clear Scheduler of any previous cron events to be sure.
-	$scheduler->clear();
-
-	// Schedule the first run.
-	$scheduler->setup()->schedule_next( $first_run );
-}
-
-/**
- * Deactivate
- *
- * Removes the cron jobs spawned by this plugin on deactivation
- *
- * @return void
- */
-function deactivate() {
-	$scheduler = new User_Feed_Import_Scheduler;
-	$scheduler->clear();
-}
+require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-options.php' );
 
 /**
  * User Manager
@@ -85,7 +52,20 @@ add_action( 'init', __NAMESPACE__ . '\\user_feed_manager' );
  * @return void
  */
 function run() {
-	$scheduler = new User_Feed_Import_Scheduler;
-	$scheduler->setup();
+	User_Feed_Import_Scheduler::factory()->setup();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\run' );
+
+/**
+ * Admin
+ *
+ * Sets up the Options page.
+ *
+ * @return void
+ */
+function admin() {
+	if ( is_admin() ) {
+		User_Feed_Options::factory()->setup();
+	}
+}
+add_action( 'init', __NAMESPACE__ . '\\admin' );
