@@ -9,3 +9,5 @@ tests/
 phpunit.xml.dist
 readme.txt
 .distignore
+
+/vendor/
