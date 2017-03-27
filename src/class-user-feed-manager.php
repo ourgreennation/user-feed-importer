@@ -139,7 +139,7 @@ class User_Feed_Manager {
 		?>
 		<div class="bp-profile-field editfield field_type_textbox field_user_feed_importer" >
 			<label for="user_rss_feed" class="label">
-				<?php _e( 'RSS Feed URL', 'user-feed-importer' ) ?>
+				<?php esc_html_e( 'RSS Feed URL', 'user-feed-importer' ) ?>
 			</label>
 			<input
 			id="user_rss_feed"
