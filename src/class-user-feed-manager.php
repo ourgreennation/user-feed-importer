@@ -132,7 +132,8 @@ class User_Feed_Manager {
 	 * @return void
 	 */
 	public function add_bp_rss_profile_field() {
-		if ( ( 1 !== bp_get_the_profile_group_id()  && ! is_admin() ) ) {
+		global $bp;
+		if ( ( 1 !== bp_get_the_profile_group_id()  && ! is_admin() ) || 'edit' !== $bp->current_action ) {
 			return;
 		}
 		$url = get_user_meta( bp_displayed_user_id(), 'user_rss_feed', true );
