@@ -29,6 +29,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'src/user-feed-functions.php' );
 
 // Require the options page if we're in the admin.
 require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-options.php' );
+require_once( plugin_dir_path( __FILE__ ) . 'src/class-user-feed-user-options.php' );
 
 /**
  * User Manager
@@ -66,6 +67,7 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\run' );
 function admin() {
 	if ( is_admin() ) {
 		User_Feed_Options::factory()->setup();
+		User_Feed_User_Options::factory()->setup();
 	}
 }
 add_action( 'init', __NAMESPACE__ . '\\admin' );
