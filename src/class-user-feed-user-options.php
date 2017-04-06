@@ -169,6 +169,7 @@ class User_Feed_User_Options {
 			id="user_rss_feed"
 			name="user_rss_feed"
 			value="<?php echo esc_attr( $user_rss_feed ); ?>"
+			style="width:20em"
 			/>
 		<p class="description" id="interval-description">
 			<?php echo esc_html( $description ); ?>
@@ -184,11 +185,6 @@ class User_Feed_User_Options {
 	 * @return void
 	 */
 	public function process_admin_actions() {
-		// Handle our own error.
-		if ( isset( $_GET['user_feed_status'] ) && 'error' === $_GET['user_feed_status'] ) {
-			$this->handle_user_feed_error();
-		}
-
 		// Ensure it's our action.
 		if ( ! isset( $_POST['action'] ) || 'update' !== $_POST['action'] ) {
 			return;
@@ -214,17 +210,14 @@ class User_Feed_User_Options {
 		if ( ! isset( $_POST['user_rss_feed'] ) ) {
 			return;
 		}
-
 		// Validate the field.
 		$feed = $this->validate_feed( $_POST['user_rss_feed'] );
 
 		// Feed is not valid, inform the user.
 		if ( false === $feed ) {
-			$redirect = add_query_arg( array(
-				'user_feed_status' => 'error',
-			), $_POST['_wp_http_referer'] );
-			wp_safe_redirect( $redirect );
-			exit;
+			$message = esc_html( 'Sorry, we could not locate an RSS feed at that location. Please try again.', 'user-rss-import' );
+			add_settings_error( self::$option_name, 'user_rss_feed', $message, 'error' );
+			return;
 		}
 
 		// Okay, the url is valid, let's update the user and schdule an import.
@@ -232,6 +225,8 @@ class User_Feed_User_Options {
 		update_user_meta( get_current_user_id(), 'user_rss_feed', $feed );
 		$scheduler = new User_Feed_Import_Scheduler( get_current_user_id(), $feed );
 		$scheduler->clear()->schedule_next( time() );
+		$message = esc_html( 'Great! An import is scheduled to begin immediately. You should see your posts soon.', 'user-rss-import' );
+		add_settings_error( self::$option_name, 'user_rss_feed', $message, 'updated' );
 	}
 
 	/**
@@ -300,8 +295,13 @@ class User_Feed_User_Options {
 			<form action="options.php" method="post">
 				<?php settings_fields( self::$option_name ); ?>
 				<?php wp_nonce_field( 'user_feed_user_options', 'user_feed_nonce' ); ?>
+
 				<h2><?php esc_html_e( 'RSS Feed Settings', 'user-feed-importer' ); ?></h2>
+
+				<?php settings_errors( self::$option_name ); ?>
+
 				<?php $this->render_intro(); ?>
+
 				<table class="form-table">
 					<tbody>
 						<tr>
