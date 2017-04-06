@@ -11,7 +11,7 @@
 namespace Lift\Plugins\User_Feed_Importer;
 
 /**
- * Class: Options
+ * Class: User_Feed_Options
  *
  * Sets up an options page in the WordPress backend, and handles the settings, the fields, and can
  * statically get the options set.
@@ -84,8 +84,8 @@ class User_Feed_Options {
 	 */
 	public function admin_menu() {
 		$return = \add_options_page(
-			'User Feed API',
-			'User Feed API',
+			'User Feed Settings',
+			'User Feed Settings',
 			'manage_options',
 			self::$option_name,
 			array( $this, 'settings_page' )
@@ -123,6 +123,14 @@ class User_Feed_Options {
 			'user_feed_settings_section'
 		);
 
+		\add_settings_field(
+			'intro_text',
+			__( 'Introduction Text', 'user-feed-importer' ),
+			array( $this, 'intro_text' ),
+			self::$option_name,
+			'user_feed_settings_section'
+		);
+
 		register_setting( self::$option_name, self::$option_name );
 	}
 
@@ -137,9 +145,9 @@ class User_Feed_Options {
 	}
 
 	/**
-	 * Live Page Field
+	 * Post Status
 	 *
-	 * Renders the live page field
+	 * Renders the post status field.
 	 *
 	 * @since  v0.1.0
 	 * @return void
@@ -168,11 +176,37 @@ class User_Feed_Options {
 	}
 
 	/**
-	 * API KEY Field
+	 * Intro Text
 	 *
-	 * Renders the live page field
+	 * Renders the intro text textarea.
 	 *
-	 * @since  v2.0.0
+	 * @since  v0.1.0
+	 * @return void
+	 */
+	public function intro_text() {
+		$settings = get_option( self::$option_name );
+		$intro_text = isset( $settings['intro_text'] ) ? $settings['intro_text'] : 'Enter your RSS feed.';
+		$description = __( 'Provide instructions and disclaimers for users entering their RSS feed.', 'user-feed-importer' );
+		?>
+		<textarea
+			type="textarea"
+			id="intro_text"
+			name="user_feed_settings[intro_text]"
+			rows="7"
+			cols="50"
+			/><?php echo esc_attr( $intro_text ); ?></textarea>
+		<p class="description" id="intro_text-description">
+			<?php echo esc_html( $description ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Interval
+	 *
+	 * Renders the interval field
+	 *
+	 * @since  v1.0.0
 	 * @return void
 	 */
 	public function interval() {
