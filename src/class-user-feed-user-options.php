@@ -219,7 +219,7 @@ class User_Feed_User_Options {
 		$feed = $this->validate_feed( $_POST['user_rss_feed'] );
 
 		// Feed is not valid, inform the user.
-		if ( ! $feed ) {
+		if ( false === $feed ) {
 			$redirect = add_query_arg( array(
 				'user_feed_status' => 'error',
 			), $_POST['_wp_http_referer'] );
@@ -244,7 +244,7 @@ class User_Feed_User_Options {
 		$feed = trim( strtolower( $feed ) );
 
 		// If nothing has changed, we don't need any validation.
-		if ( get_user_meta( get_current_user_id(), 'user_rss_feed', true ) === $feed ) {
+		if ( get_user_meta( get_current_user_id(), 'user_rss_feed', true ) === $feed || '' === $feed ) {
 			return $feed;
 		}
 
