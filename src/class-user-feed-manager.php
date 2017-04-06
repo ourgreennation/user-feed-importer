@@ -88,15 +88,6 @@ class User_Feed_Manager {
 			return $this;
 		}
 
-		// Add RSS Field to Standard WordPress.
-		add_filter( 'user_contactmethods', array( $this, 'add_rss_profile_field' ) );
-
-		// Also support Buddypress.
-		add_action( 'bp_after_profile_field_content', array( $this, 'add_bp_rss_profile_field' ), 2 );
-		add_action( 'edit_user_profile_update', array( $this, 'save_rss_profile_field' ) );
-		add_action( 'personal_options_update', array( $this, 'save_rss_profile_field' ) );
-		add_action( 'xprofile_updated_profile', array( $this, 'save_rss_profile_field' ) );
-
 		// When a user adds or updates a feed, schedule imports for the feed.
 		add_action( 'update_user_meta', array( $this, 'handle_feed_meta_update' ), 10, 4 );
 		return $this;
@@ -132,7 +123,8 @@ class User_Feed_Manager {
 	 * @return void
 	 */
 	public function add_bp_rss_profile_field() {
-		if ( ( 1 !== bp_get_the_profile_group_id()  && ! is_admin() ) ) {
+		global $bp;
+		if ( ( 1 !== bp_get_the_profile_group_id()  && ! is_admin() ) || 'edit' !== $bp->current_action ) {
 			return;
 		}
 		$url = get_user_meta( bp_displayed_user_id(), 'user_rss_feed', true );
